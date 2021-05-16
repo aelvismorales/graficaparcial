@@ -1,0 +1,6 @@
+﻿  Building Custom Rule C:/glfw-3.3.3/tests/CMakeLists.txt
+  threads.c
+  tinycthread.c
+  glad_gl.c
+  Generando código...
+  threads.vcxproj -> C:\glfw-3.3.3\build\tests\Debug\threads.exe

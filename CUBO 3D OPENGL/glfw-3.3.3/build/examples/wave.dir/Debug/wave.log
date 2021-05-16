@@ -1,0 +1,5 @@
+﻿  Building Custom Rule C:/glfw-3.3.3/examples/CMakeLists.txt
+  wave.c
+  glad_gl.c
+  Generando código...
+  wave.vcxproj -> C:\glfw-3.3.3\build\examples\Debug\wave.exe
