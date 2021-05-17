@@ -3,13 +3,25 @@
 #include <vaos.h>
 #include <camara.h>
 
+#include<cstdio>
+#include <random>
+
 #include <glm/gtx/string_cast.hpp>
 #include <vector>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
+#include "Texture.h"
 using namespace std;
-
+//*****************************************
+constexpr ui32 MAX_X{ 10 };
+constexpr ui32 MAX_Z{ 10 };
+//constexpr uint MAX_HEIGHT{100};
+constexpr ui32 NUMBER_OF_ITERATIONS{ 10 };
+#include "terreno.h"
+double terrain[MAX_X][MAX_Z];
+std::vector<glm::vec4> transition;
+//******************************************
 const ui32 FSIZE = sizeof(f32);
 const ui32 ISIZE = sizeof(i32);
 const ui32 SCR_WIDTH = 960;
@@ -81,17 +93,18 @@ void scroll_Callback(GLFWwindow* window, f64 xoffset, f64 yoffset)
 }
 
 i32 main() {
+	generate_terrain<MAX_X, MAX_Z>(terrain, 10);
+	generate_transitions<MAX_X, MAX_Z>(terrain, transition);
+
 	GLFWwindow* window = glutilInit(3, 3, SCR_WIDTH, SCR_HEIGHT, "Terrain?", mouse_Callback, scroll_Callback);
 
 	Shader* shader = new Shader();
 
-	Shader* shader_tierra = new Shader("bin", "resources/textures", "shader_tierra.vert", "shader_tierra.frag");
-
+	Shader* shader_tierra = new Shader("bin", "resources/textures", "shader_minecraft.vert", "shader_minecraft.frag");
 
 	Cube* cubex = new Cube();
 	Cube* cubito = new Cube();
 	
-
 	ui32 o = 5;
 
 	std::vector<glm::vec3> positions(o*o*o);
@@ -101,51 +114,32 @@ i32 main() {
 		{
 			for (ui32 h = 0; h < o; ++h)
 			{
-				
-			
 				f32 x = i - o / 2.0f;
 				f32 y = j - o/ 2.0f;
 				f32 z = h - o / 2.0f;
 				positions[(i * o * o) + (j * o) + h] = glm::vec3(x, y, z);
 				std::cout << x << "\t" << y << "\t" << z << "\n";
-				
 			}
 		}
-		
 	}
-	
-	//cubex->inicializar_vaos(true, true);
-	//cubito->inicializar_vaos(true, true);
-	/*ui32 vbo, vao, ebo;
-	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &ebo);
 
-	glBindVertexArray(vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(f32) *cubex->getVSize(), cubex->getVertices(),GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(f32)*cubex->getISize(), cubex->getIndices(), GL_STATIC_DRAW);
-
-	// posiciones
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * FSIZE, (void*)0);
-	glEnableVertexAttribArray(0);
-	// colores
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * FSIZE, (void*)(3 * FSIZE));
-	glEnableVertexAttribArray(1);
-	// textures
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(f32), (void*)(6 * sizeof(f32)));
-	glEnableVertexAttribArray(2);
-	
-	glEnable(GL_DEPTH_TEST);*/
 	VAO* vao_cubo = new VAO(cubex);
 	vao_cubo->inicializar_vaos(true, true);
-	ui32 texture1 = shader->loadTexture("tierra_ver.jpg", texture1);
-	//ui32 texture2 = shader->loadTexture("rubik.jpg", texture2);
+	ui32 texture1 = shader->loadTexture("tierra.jpg", texture1);
+	/*
+	Texture sideTexture;
+	sideTexture.bind(GL_TEXTURE_2D);
+	sideTexture.generateTexture("C:/Users/Cristopher/source/repos/graficaparagitear/graficaparcial/CUBO 3D OPENGL/CUBO 3D OPENGL/resources/grass-side-420x420.jpeg", GL_RGB);
+
+	Texture topTexture;
+	topTexture.bind(GL_TEXTURE_2D);
+	topTexture.generateTexture("C:/Users/Cristopher/source/repos/graficaparagitear/graficaparcial/CUBO 3D OPENGL/CUBO 3D OPENGL/resources/grass-top-420x420.png", GL_RGBA);
+
+	Texture dirtTexture;
+	dirtTexture.bind(GL_TEXTURE_2D);
 	
-	
+	dirtTexture.generateTexture("C:/Users/Cristopher/source/repos/graficaparagitear/graficaparcial/CUBO 3D OPENGL/CUBO 3D OPENGL/resources/dirt.png", GL_RGBA);
+	*/
 	while (!glfwWindowShouldClose(window)) {
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
@@ -158,7 +152,7 @@ i32 main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // Solo mostrara como lineas 
-		shader->useProgram();
+		/*shader->useProgram();
 
 		glm::mat4 projection = glm::perspective(glm::radians(camara->getFov()), ASPECT, 0.1f, 100.0f);
 
@@ -176,7 +170,65 @@ i32 main() {
 			glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
 			
 			}		
-		
+		*/
+		shader->useProgram();
+		glm::mat4 projection = glm::perspective(glm::radians(camara->getFov()), ASPECT, 0.1f, 100.0f);
+		shader->setMat4("proj", projection);
+		shader->setMat4("view", camara->getViewM4());
+
+		glBindVertexArray(vao_cubo->get_VAO());
+		for (auto& vec : transition)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			//std::cout << vec.x << ' ' << vec.y << " " << vec.z << "\n";
+			std::cout << transition.size() << endl;
+
+			model = glm::translate(model, glm::vec3(vec.x, vec.y, vec.z) * glm::vec3(2.0f, 2.0f, 2.0f));
+			shader->setMat4("model", model);
+			glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
+
+			/*if(vec.w==1)
+			{
+				//glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, textura_side);
+				glBindVertexArray(VAOside);
+				glDrawArrays(GL_TRIANGLES, 0, 24);
+
+				//glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, top_Texture);
+				glBindVertexArray(VAOtop);
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+			}
+			else
+			{
+				//glActiveTexture(GL_TEXTURE2);
+				glBindTexture(GL_TEXTURE_2D, dirtTexture);
+				glBindVertexArray(VAOdirt);
+				glDrawArrays(GL_TRIANGLES, 0, 36);
+
+			}*/
+			/*if (vec.w == 1) {
+				glActiveTexture(GL_TEXTURE0);
+				sideTexture.bind(GL_TEXTURE_2D);
+
+				glBindVertexArray(VAOside);
+				glDrawArrays(GL_TRIANGLES, 0, 24);
+
+				glActiveTexture(GL_TEXTURE0);
+				topTexture.bind(GL_TEXTURE_2D);
+
+				glBindVertexArray(VAOtop);
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+			}
+			else {
+				glActiveTexture(GL_TEXTURE0);
+				dirtTexture.bind(GL_TEXTURE_2D);
+
+				glBindVertexArray(VAOdirt);
+				glDrawArrays(GL_TRIANGLES, 0, 36);
+			}*/
+		}
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
