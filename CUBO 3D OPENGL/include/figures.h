@@ -14,12 +14,12 @@ class Cube
 	ui32 ebo;
 	bool rgb;
 	bool texture;
-	Shader* shader;
+	
 public:
-	Cube(Shader* shader,f32 width = 1.0f, f32 height = 1.0f, f32 depth = 1.0f)
+	Cube(f32 width = 1.0f, f32 height = 1.0f, f32 depth = 1.0f)
 		: width(width), height(height), depth(depth),
 		vertices(new f32[16 * 8]), indices(new ui32[6 * 6]) {
-		this->shader = shader;
+		
 		f32 wm = width / 2.0f;
 		f32 hm = height / 2.0f;
 		f32 dm = depth / 2.0f;
@@ -136,14 +136,14 @@ public:
 
 	}
 	
-	ui32 loadTexture(std::string path, unsigned int& texture)
+	/*ui32 loadTexture(std::string path, unsigned int& texture)
 	{
 		return(shader->loadTexture(path, texture));
 	}
 	void setIntero(const i8* name, const int& i)
 	{
 		shader->setI32(name,i);
-	}
+	}*/
 	ui32 get_VAO() { return vao; }
 	ui32 get_VBO() { return vbo; }
 	ui32 get_EBO() { return ebo; }
