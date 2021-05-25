@@ -6,7 +6,6 @@
 #include<cstdio>
 #include <random>
 
-//#include <glm/gtx/string_cast.hpp>
 #include <vector>
 #include <math.h>
 #include <stdlib.h>
@@ -14,10 +13,10 @@
 #include "Texture.h"
 using namespace std;
 //*****************************************
-constexpr ui32 MAX_X{ 70 };
-constexpr ui32 MAX_Z{ 70 };
+constexpr ui32 MAX_X{ 30 };
+constexpr ui32 MAX_Z{ 30 };
 //constexpr uint MAX_HEIGHT{100};
-constexpr ui32 NUMBER_OF_ITERATIONS{8};
+constexpr ui32 NUMBER_OF_ITERATIONS{10};
 #include "terreno.h"
 double terrain[MAX_X][MAX_Z];
 std::vector<glm::vec4> transition;
@@ -39,7 +38,6 @@ f32 sensitivity = 0.1f;
 
 f32 deltaTime = 0.0f;
 f32 lastFrame = 0.0f;
-
 
 /**
  * keyboard input processing
@@ -69,28 +67,25 @@ void processInput(GLFWwindow* window) {
 }
 void mouse_Callback(GLFWwindow* window, f64 xpos, f64 ypos)
 {
-	if (firstMouse)
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) 
 	{
+		if (firstMouse)
+		{
+			lastX = xpos;
+			lastY = ypos;
+			firstMouse = false;
+			return;
+		}
+		camara->mouse_proccess((f32)(xpos - lastX), (f32)(lastY - ypos));
 		lastX = xpos;
 		lastY = ypos;
-		firstMouse = false;
 	}
-	f32 xoffset = xpos - lastX; // cuanto se ha movido en X 
-	f32 yoffset = lastY - ypos;
-
-	lastX = xpos;
-	lastY = ypos;
-	camara->mouse_proccess(xoffset, yoffset);
+	else 
+	{
+		firstMouse = true;
+	}
 }
-/*f32 top[]={
-	-0.5f, 0.5f, 0.5f, 1.0f, 0.0, 0.0, 0.0f, 0.0f,  // 8
-	0.5f, 0.5f, 0.5f, 1.0f, 0.0, 0.0, 1.0f, 0.0f,  // 9
-	-0.5f, -0.5f, 0.5f, 1.0f, 0.0, 0.0, 0.0f, 0.0f,  // 10
-	0.5f, -0.5f, 0.5f, 1.0f, 0.0, 0.0, 1.0f, 0.0f,  // 11
-	-0.5f, 0.5f, -0.5f, 1.0f, 0.0, 0.0, 0.0f, 1.0f,  // 12
-	0.5f, 0.5f, -0.5f, 1.0f, 0.0, 0.0, 1.0f, 1.0f,  // 13
-	-0.5f, -0.5f, -0.5f, 1.0f, 0.0, 0.0, 0.0f, 1.0f,  // 14
-	0.5f, -0.5f, -0.5f, 1.0f, 0.0, 0.0, 1.0f, 1.0f }; // 15*/
+
 
 void scroll_Callback(GLFWwindow* window, f64 xoffset, f64 yoffset)
 {
@@ -108,25 +103,6 @@ i32 main() {
 	Shader* shader_tierra = new Shader("bin", "resources/textures", "shader.vert", "shader_tierra.frag");
 
 	Cube* cubex = new Cube();
-	//(i - g / 2.0f)Cube* cubito = new Cube();
-	
-	//ui32 o = 5;
-
-	/*std::vector<glm::vec3> positions(o*o*o);
-	for (ui32 i=0; i < o; ++i)
-	{
-		for( ui32 j=0;j<o;++j)
-		{
-			for (ui32 h = 0; h < o; ++h)
-			{
-				f32 x = i - o / 2.0f;
-				f32 y = j - o/ 2.0f;
-				f32 z = h - o / 2.0f;
-				positions[(i * o * o) + (j * o) + h] = glm::vec3(x, y, z);
-				std::cout << x << "\t" << y << "\t" << z << "\n";
-			}
-		}
-	}*/
 
 	ui32 g = 1;
 	std::vector<glm::vec3> positions_tierra(g * g);//PINTA
@@ -154,15 +130,11 @@ i32 main() {
 	ui32 texture4 = shader->loadTexture("cesped.jpg", texture4);
 
 	//glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-	//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	while (!glfwWindowShouldClose(window)) {
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		processInput(window);
-
-		//glBindTexture(GL_TEXTURE_2D, texture1);
-		
 		glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -171,16 +143,19 @@ i32 main() {
 		
 
 		glm::mat4 projection = glm::perspective(glm::radians(camara->getFov()), ASPECT, 0.1f, 100.0f);
-
+		f32 theta = (f32)glfwGetTime();
 		shader_tierra->setMat4("proj", projection);
-
+		shader_tierra->setVec3("mycolor", sin(theta), 1.0f, 0.0f);
 		shader_tierra->setMat4("view", camara->getViewM4());
 
 		glBindVertexArray(vao_cubo_light->get_VAO());
 		
 		for (ui32 i = 0; i < positions_tierra.size(); ++i) {  // Importantisimo para la generacion de los terrenos
 			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, positions_tierra[i]);
+			
+			//model = glm::rotate(model, sin(theta)+50.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+
+			model = glm::translate(model, glm::vec3(-3.0f,1.0f,0.5f)/*positions_tierra[i]*/);
 			shader_tierra->setMat4("model", model);
 
 			glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
@@ -188,8 +163,10 @@ i32 main() {
 			}		
 		
 		shader->useProgram();
-		shader->setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-		shader->setVec3("lightColorr", 1.0f, 1.0f, 1.0f);
+		//shader->setVec3("objectColor", 1.0f, 0.5f, 0.31f); 
+		//shader->setVec3("lightPos", positions_tierra[0].x, positions_tierra[0].y ,positions_tierra[0].z );
+		shader->setVec3("lightPos", -3.0f, 1.0f, 0.5f);
+		shader->setVec3("lightColor", sin(theta),1.0f, 1.0f);
 		//glm::mat4 projection = glm::perspective(glm::radians(camara->getFov()), ASPECT, 0.1f, 100.0f);
 		shader->setMat4("proj", projection);
 		shader->setMat4("view", camara->getViewM4());
@@ -220,6 +197,8 @@ i32 main() {
 			glm::mat4 model = glm::mat4(1.0f);
 			//std::cout << vec.x << ' ' << vec.y << " " << vec.z << "\n";
 			model = glm::translate(model, glm::vec3(vec.x, vec.y, vec.z) * glm::vec3(2.0f, 2.0f, 2.0f));
+			//f32 theta = (f32)glfwGetTime();
+			//model = glm::rotate(model, sin(theta)+50.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 			shader->setMat4("model", model);
 			glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
 

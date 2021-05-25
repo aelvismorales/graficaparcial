@@ -24,24 +24,24 @@ public:
 		f32 hm = height / 2.0f;
 		f32 dm = depth / 2.0f;
 		f32 temp[] = {
-			// posiciones        colores          texturas
-		   -wm,  hm,  dm,  1.0f,0.0f,0.0f,  0.0f, 1.0f,  // 0
-			wm,  hm,  dm,  1.0f,0.0f,0.0f,  1.0f, 1.0f,  // 1
-		   -wm, -hm,  dm,  1.0f,0.0f,0.0f,   0.0f, 0.0f,  // 2
-			wm, -hm,  dm,  1.0f,0.0f,0.0f,   1.0f, 0.0f,  // 3
-		   -wm,  hm, -dm,  1.0f,0.0f,0.0f,   1.0f, 1.0f,  // 4
-			wm,  hm, -dm,  1.0f,0.0f,0.0f,   0.0f, 1.0f,  // 5
-		   -wm, -hm, -dm,  1.0f,0.0f,0.0f,   1.0f, 0.0f,  // 6
-			wm, -hm, -dm,  1.0f,0.0f,0.0f,   0.0f, 0.0f,  // 7
-						   
+			// posiciones        Normales(colores)          texturas
+		   -wm,  hm,  dm,  0.0f,0.0f,1.0f,  0.0f, 1.0f,  // 0
+			wm,  hm,  dm,  0.0f,0.0f,1.0f,  1.0f, 1.0f,  // 1
+		   -wm, -hm,  dm,  0.0f,0.0f,1.0f,   0.0f, 0.0f,  // 2
+			wm, -hm,  dm,  0.0f,0.0f,1.0f,   1.0f, 0.0f,  // 3
+			-wm,  hm, -dm, 0.0f,1.0f,0.0f,   1.0f, 1.0f,  // 4
+			wm,  hm, -dm,  0.0f,1.0f,0.0f,   0.0f, 1.0f,  // 5
+		   -wm, -hm, -dm,  0.0f,1.0f,0.0f,   1.0f, 0.0f,  // 6
+			wm, -hm, -dm,  0.0f,1.0f,0.0f,   0.0f, 0.0f,  // 7			   
 		   -wm,  hm,  dm,  1.0f,0.0f,0.0f,   0.0f, 0.0f,  // 8
 			wm,  hm,  dm,  1.0f,0.0f,0.0f, 1.0f, 0.0f,  // 9
 		   -wm, -hm,  dm,  1.0f,0.0f,0.0f, 0.0f, 0.0f,  // 10
 			wm, -hm,  dm,  1.0f,0.0f,0.0f, 1.0f, 0.0f,  // 11
-		   -wm,  hm, -dm,  1.0f,0.0f,0.0f, 0.0f, 1.0f,  // 12
-			wm,  hm, -dm,  1.0f,0.0f,0.0f, 1.0f, 1.0f,  // 13
-		   -wm, -hm, -dm,  1.0f,0.0f,0.0f, 0.0f, 1.0f,  // 14
-			wm, -hm, -dm,  1.0f,0.0f,0.0f, 1.0f, 1.0f }; // 15
+			-wm,  hm, -dm, 0.0f,0.0f,1.0f, 0.0f, 1.0f,  // 12
+			wm,  hm, -dm,  0.0f,0.0f,1.0f, 1.0f, 1.0f,  // 13
+		   -wm, -hm, -dm,  0.0f,0.0f,1.0f, 0.0f, 1.0f,  // 14
+			wm, -hm, -dm,  0.0f,0.0f,1.0f, 1.0f, 1.0f }; // 15
+
 		for (ui32 i = 0; i < 16 * 8; ++i) {
 			vertices[i] = temp[i];
 		}
@@ -75,75 +75,7 @@ public:
 	ui32 getISize() {
 		return 6 * 6;
 	}
-	void inicializar_vaos(bool rgb, bool texture)
-	{
-		glGenVertexArrays(1, &vao);
-		glGenBuffers(1, &vbo);
-
-		glBindVertexArray(vao);
-
-
-		if (this->getISize() > 0) {
-			glGenBuffers(1, &ebo);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(i32) * this->getISize(), this->getIndices(), GL_STATIC_DRAW);
-		}
-		if (this->rgb == false && this->texture == false) {
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * this->getVSize(), this->getVertices(), GL_STATIC_DRAW);
-			// posiciones
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(f32), (void*)0);
-			glEnableVertexAttribArray(0);
-		}
-		if (this->rgb == true)
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * this->getVSize(), this->getVertices(), GL_STATIC_DRAW);
-			// posiciones
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(f32), (void*)0);
-			glEnableVertexAttribArray(0);
-			// colores
-			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(f32), (void*)(3 * sizeof(f32)));
-			glEnableVertexAttribArray(1);
-		}
-		if (this->texture == true)
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * this->getVSize(), this->getVertices(), GL_STATIC_DRAW);
-			// posiciones
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(f32), (void*)0);
-			glEnableVertexAttribArray(0);
-			// textures
-			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(f32), (void*)(3 * sizeof(f32)));
-			glEnableVertexAttribArray(2);
-		}
-		if (!this->rgb == true && !this->texture == true)
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(f32) * this->getVSize(), this->getVertices(), GL_DYNAMIC_DRAW);
-			// posiciones
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(f32), (void*)0);
-			glEnableVertexAttribArray(0);
-			// colores
-			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(f32), (void*)(3 * sizeof(f32)));
-			glEnableVertexAttribArray(1);
-			// textures
-			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(f32), (void*)(6 * sizeof(f32)));
-			glEnableVertexAttribArray(2);
-		}
-
-		glEnable(GL_DEPTH_TEST);
-
-	}
 	
-	/*ui32 loadTexture(std::string path, unsigned int& texture)
-	{
-		return(shader->loadTexture(path, texture));
-	}
-	void setIntero(const i8* name, const int& i)
-	{
-		shader->setI32(name,i);
-	}*/
 	ui32 get_VAO() { return vao; }
 	ui32 get_VBO() { return vbo; }
 	ui32 get_EBO() { return ebo; }
