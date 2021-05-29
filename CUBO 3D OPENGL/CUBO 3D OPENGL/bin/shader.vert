@@ -15,8 +15,10 @@ uniform mat4 proj;
 void main() 
 {
 	frag_Pos=vec3(model * vec4(vertPos, 1.0));
-	gl_Position = proj * view * model * vec4(vertPos, 1.0);
-	fragColor = vertColor;
+	//fragColor = mat3(transpose(inverse(model)))*vertColor;
+	fragColor = mat3(transpose(inverse(model))) * vertColor;
+	gl_Position = proj * view * vec4(frag_Pos, 1.0);
+	
 	texCoord = vec2(myTexCoord.x, myTexCoord.y);
 }
 

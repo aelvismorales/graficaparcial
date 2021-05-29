@@ -1,9 +1,20 @@
 ﻿  MapaMinecraft.cpp
 C:\Users\Cristopher\source\repos\graficaparagitear\graficaparcial\CUBO 3D OPENGL\CUBO 3D OPENGL\perlin.h(24,9): warning C4244: 'inicializando': conversión de 'double' a 'int'; posible pérdida de datos
 C:\Users\Cristopher\source\repos\graficaparagitear\graficaparcial\CUBO 3D OPENGL\CUBO 3D OPENGL\perlin.h(26,9): warning C4244: 'inicializando': conversión de 'double' a 'int'; posible pérdida de datos
-C:\Users\Cristopher\source\repos\graficaparagitear\graficaparcial\CUBO 3D OPENGL\CUBO 3D OPENGL\MapaMinecraft.cpp(74,12): warning C4244: '=': conversión de 'f64' a 'f32'; posible pérdida de datos
-C:\Users\Cristopher\source\repos\graficaparagitear\graficaparcial\CUBO 3D OPENGL\CUBO 3D OPENGL\MapaMinecraft.cpp(75,12): warning C4244: '=': conversión de 'f64' a 'f32'; posible pérdida de datos
-C:\Users\Cristopher\source\repos\graficaparagitear\graficaparcial\CUBO 3D OPENGL\CUBO 3D OPENGL\MapaMinecraft.cpp(80,11): warning C4244: '=': conversión de 'f64' a 'f32'; posible pérdida de datos
-C:\Users\Cristopher\source\repos\graficaparagitear\graficaparcial\CUBO 3D OPENGL\CUBO 3D OPENGL\MapaMinecraft.cpp(81,11): warning C4244: '=': conversión de 'f64' a 'f32'; posible pérdida de datos
-C:\Users\Cristopher\source\repos\graficaparagitear\graficaparcial\CUBO 3D OPENGL\CUBO 3D OPENGL\MapaMinecraft.cpp(134,22): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Cristopher\source\repos\graficaparagitear\graficaparcial\CUBO 3D OPENGL\CUBO 3D OPENGL\MapaMinecraft.cpp(89,12): warning C4244: '=': conversión de 'f64' a 'f32'; posible pérdida de datos
+C:\Users\Cristopher\source\repos\graficaparagitear\graficaparcial\CUBO 3D OPENGL\CUBO 3D OPENGL\MapaMinecraft.cpp(90,12): warning C4244: '=': conversión de 'f64' a 'f32'; posible pérdida de datos
+C:\Users\Cristopher\source\repos\graficaparagitear\graficaparcial\CUBO 3D OPENGL\CUBO 3D OPENGL\MapaMinecraft.cpp(95,11): warning C4244: '=': conversión de 'f64' a 'f32'; posible pérdida de datos
+C:\Users\Cristopher\source\repos\graficaparagitear\graficaparcial\CUBO 3D OPENGL\CUBO 3D OPENGL\MapaMinecraft.cpp(96,11): warning C4244: '=': conversión de 'f64' a 'f32'; posible pérdida de datos
+C:\Users\Cristopher\source\repos\graficaparagitear\graficaparcial\CUBO 3D OPENGL\CUBO 3D OPENGL\MapaMinecraft.cpp(147,14): warning C4244: 'inicializando': conversión de 'double' a 'ui32'; posible pérdida de datos
+C:\Users\Cristopher\source\repos\graficaparagitear\graficaparcial\CUBO 3D OPENGL\CUBO 3D OPENGL\MapaMinecraft.cpp(149,22): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Cristopher\source\repos\graficaparagitear\graficaparcial\CUBO 3D OPENGL\CUBO 3D OPENGL\MapaMinecraft.cpp(155,33): warning C4244: '=': conversión de 'T' a 'ui32'; posible pérdida de datos
+          with
+          [
+              T=float
+          ]
+C:\Users\Cristopher\source\repos\graficaparagitear\graficaparcial\CUBO 3D OPENGL\CUBO 3D OPENGL\MapaMinecraft.cpp(156,34): warning C4244: '=': conversión de 'T' a 'ui32'; posible pérdida de datos
+          with
+          [
+              T=float
+          ]
   CUBO 3D OPENGL.vcxproj -> C:\Users\Cristopher\source\repos\graficaparagitear\graficaparcial\CUBO 3D OPENGL\x64\Debug\CUBO 3D OPENGL.exe

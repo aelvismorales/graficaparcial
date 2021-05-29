@@ -38,7 +38,6 @@ inline bool in_range(int x, int y) {
 template <uint rows, uint columns>
 void generate_terrain(double(&terrain)[rows][columns], uint number_of_iterations) {
     generate_gradient_matrix(gradient);
-
     for (auto i = 0u; i < rows; ++i) {
         for (auto j = 0u; j < columns; ++j) {
             terrain[i][j] = perlin(i * 0.135f, j * 0.135) + 0.50;
@@ -47,19 +46,17 @@ void generate_terrain(double(&terrain)[rows][columns], uint number_of_iterations
 }
 
 template <uint rows, uint columns>
-void generate_transitions(double(&terrain)[rows][columns], std::vector<glm::vec4>& transition) {
+void generate_transitions(double(&terrain)[rows][columns], std::vector<glm::vec4>& transition, glm::vec3 position,ui32 set_pos_x,ui32 set_pos_z) {
     for (auto i = 0u; i < rows; ++i) {
         for (auto j = 0u; j < columns; ++j) {
             terrain[i][j] *= 6.75;
             terrain[i][j] = std::round(terrain[i][j]);
         }
     }
-
-
     for (auto i = 0u; i < rows; ++i) {
         for (auto j = 0u; j < columns; ++j) {
             for (auto h = 0; h < terrain[i][j]; ++h) {
-                transition.push_back(glm::vec4(i * 0.5f, h / 2.0, j * 0.5f, h == (terrain[i][j] - 1)));
+                transition.push_back(glm::vec4(i * 0.5f+set_pos_x*16, h / 2.0, j * 0.5f + set_pos_z * 16, h == (terrain[i][j] - 1)));
             }
         }
     }

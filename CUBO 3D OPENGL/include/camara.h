@@ -20,7 +20,7 @@ class Camara
 	f32 sensitivity;
 
 public:
-	Camara(f32 px=4.0f,f32 py=3.0f,f32 pz=10.0f ,f32 fx=0.0f ,f32 fy=0.0f, f32 fz=-1.0f ,f32 ux=0.0f,f32 uy=1.0f,f32 uz=0.0f,
+	Camara(f32 px=4.0f,f32 py=3.0f,f32 pz=1.0f ,f32 fx=0.0f ,f32 fy=0.0f, f32 fz=-1.0f ,f32 ux=0.0f,f32 uy=1.0f,f32 uz=0.0f,
 		f32 yaw = -90.0f, f32 pitch = 0.0f, f32 fov = 45.0f, f32 speed = 8.5, f32 sensitivity = 0.1) :position({ px,py,pz }), front({fx,fy,fz}),
 		up({ ux,uy,uz }), worldup({px,py,pz}), yaw(yaw), pitch(pitch), fov(fov), speed(speed), sensitivity(sensitivity)
 	{
@@ -89,6 +89,14 @@ public:
 	f32 getFov()
 	{
 		return fov;
+	}
+	glm::vec3 getPos() 
+	{
+		return position;
+	}
+	void set_speed(f32 spedy)
+	{
+		speed = spedy;
 	}
 private:
 	void updateVectors()

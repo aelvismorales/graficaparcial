@@ -34,7 +34,7 @@ void framebuffer_size_callback(GLFWwindow* window, i32 width, i32 height) {
 
 GLFWwindow* glutilInit(i32 major, i32 minor,
 		i32 width, i32 height,
-		const char* title,GLFWcursorposfun mouse_Callback,GLFWscrollfun scroll_Callback,i32 screenWidth = 1366,
+		const char* title,GLFWcursorposfun mouse_Callback,GLFWscrollfun scroll_Callback,GLFWkeyfun key_callback,i32 screenWidth = 1366,
 	i32 screenHeight = 768) {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, major);
@@ -45,6 +45,7 @@ GLFWwindow* glutilInit(i32 major, i32 minor,
 	glfwSetWindowPos(window, screenWidth / 2 - width / 2, screenHeight / 2 - height / 2);
 	glfwSetCursorPosCallback(window, mouse_Callback);
 	glfwSetScrollCallback(window, scroll_Callback);
+	glfwSetKeyCallback(window, key_callback);
 	if (window == nullptr) {
 		std::cerr << "Failed to create GLFW Window\n";
 		glfwTerminate();

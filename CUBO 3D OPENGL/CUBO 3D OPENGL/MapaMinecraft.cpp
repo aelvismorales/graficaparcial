@@ -13,12 +13,14 @@
 #include "Texture.h"
 using namespace std;
 //*****************************************
-constexpr ui32 MAX_X{ 30 };
-constexpr ui32 MAX_Z{ 30 };
+
+constexpr ui32 MAX_X{16};
+constexpr ui32 MAX_Z{16};
 //constexpr uint MAX_HEIGHT{100};
 constexpr ui32 NUMBER_OF_ITERATIONS{10};
 #include "terreno.h"
 double terrain[MAX_X][MAX_Z];
+
 std::vector<glm::vec4> transition;
 //******************************************
 const ui32 FSIZE = sizeof(f32);
@@ -46,8 +48,9 @@ void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) { 
 		camara->inputprocces(UP, deltaTime);
+		
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		camara->inputprocces(LEFT, deltaTime);
@@ -64,6 +67,18 @@ void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
 		camara->inputprocces(GODOWN, deltaTime);
 	}
+
+	
+	
+}
+
+void key_callback(GLFWwindow* window, int key, int code, int action, int mods) {
+	if (key == GLFW_KEY_Y && action == GLFW_PRESS)
+	{
+		//generate_transitions<MAX_X, MAX_Z>(terrain, transition, camara->getPos());
+		//cout << "GG" << endl;
+	}
+
 }
 void mouse_Callback(GLFWwindow* window, f64 xpos, f64 ypos)
 {
@@ -93,10 +108,12 @@ void scroll_Callback(GLFWwindow* window, f64 xoffset, f64 yoffset)
 }
 
 i32 main() {
+	ui32 set_pos_z=0;
+	ui32 set_pos_x=0;
 	generate_terrain<MAX_X, MAX_Z>(terrain, NUMBER_OF_ITERATIONS);
-	generate_transitions<MAX_X, MAX_Z>(terrain, transition);
+	generate_transitions<MAX_X, MAX_Z>(terrain, transition, camara->getPos(), set_pos_x, set_pos_z);
 
-	GLFWwindow* window = glutilInit(3, 3, SCR_WIDTH, SCR_HEIGHT, "Terrain?", mouse_Callback, scroll_Callback);
+	GLFWwindow* window = glutilInit(3, 3, SCR_WIDTH, SCR_HEIGHT, "Terrain?", mouse_Callback, scroll_Callback, key_callback);
 
 	Shader* shader = new Shader();
 
@@ -112,8 +129,7 @@ i32 main() {
 		{
 			f32 x = (i - g / 2.0f);
 			f32 z = (i - j / 2.0f);
-			f32 y = 8.0;/*x*x / 10 - z*z / 10;*/
-			//i - n/2.0f,pow((i-2/2.0f),2)/10- pow((j - 2 / 2.0f), 2) / 10, j - n/2.0f
+			f32 y = 8.0;
 			positions_tierra[i * g + j] = glm::vec3(x, y, z);
 		}
 	}
@@ -128,8 +144,7 @@ i32 main() {
 	ui32 texture2 = shader->loadTexture("tierra.jpg", texture2);
 	ui32 texture3 = shader->loadTexture("roca.jpg", texture3);
 	ui32 texture4 = shader->loadTexture("cesped.jpg", texture4);
-
-	//glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+	ui32 limite = 0.5;
 	while (!glfwWindowShouldClose(window)) {
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
@@ -137,25 +152,37 @@ i32 main() {
 		processInput(window);
 		glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		set_pos_z = camara->getPos().z/16;
+		set_pos_x = camara->getPos().x / 16;
+		/*if (set_pos_z == 16) 
+		{
+			generate_transitions<MAX_X, MAX_Z>(terrain, transition, camara->getPos(), set_pos_x, set_pos_z);
+			set_pos_z = 0;
+		}*/
+		/*if (set_pos_z >limite )
+		{
+			camara->set_speed(0);
+			cout << camara->getPos().z << endl;
+			generate_transitions<MAX_X, MAX_Z>(terrain, transition, camara->getPos(), set_pos_x, set_pos_z);
 
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // Solo mostrara como lineas 
+			limite += limite;
+			
+		}*/
+
 		shader_tierra->useProgram();
 		
 
 		glm::mat4 projection = glm::perspective(glm::radians(camara->getFov()), ASPECT, 0.1f, 100.0f);
 		f32 theta = (f32)glfwGetTime();
 		shader_tierra->setMat4("proj", projection);
-		shader_tierra->setVec3("mycolor", sin(theta), 1.0f, 0.0f);
+		shader_tierra->setVec3("mycolor", 1.0f, 1.0f, 1.0f);
 		shader_tierra->setMat4("view", camara->getViewM4());
 
 		glBindVertexArray(vao_cubo_light->get_VAO());
 		
-		for (ui32 i = 0; i < positions_tierra.size(); ++i) {  // Importantisimo para la generacion de los terrenos
+		for (ui32 i = 0; i < positions_tierra.size(); ++i) { 
 			glm::mat4 model = glm::mat4(1.0f);
-			
-			//model = glm::rotate(model, sin(theta)+50.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-
-			model = glm::translate(model, glm::vec3(-3.0f,1.0f,0.5f)/*positions_tierra[i]*/);
+			model = glm::translate(model, glm::vec3(-3.0f, 10.0f, 0.5f));
 			shader_tierra->setMat4("model", model);
 
 			glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
@@ -163,17 +190,18 @@ i32 main() {
 			}		
 		
 		shader->useProgram();
-		//shader->setVec3("objectColor", 1.0f, 0.5f, 0.31f); 
-		//shader->setVec3("lightPos", positions_tierra[0].x, positions_tierra[0].y ,positions_tierra[0].z );
-		shader->setVec3("lightPos", -3.0f, 1.0f, 0.5f);
-		shader->setVec3("lightColor", sin(theta),1.0f, 1.0f);
-		//glm::mat4 projection = glm::perspective(glm::radians(camara->getFov()), ASPECT, 0.1f, 100.0f);
+		shader->setVec3("objectColor", 1.0f, 1.0f, 1.0f);
+		shader->setVec3("viewPos", camara->getPos().x, camara->getPos().y, camara->getPos().z);
+		shader->setVec3("lightPos", 3.0f, 8.0f, 0.5f);
+		shader->setVec3("lightColor", 1.0f,1.0f, 1.0f);
 		shader->setMat4("proj", projection);
 		shader->setMat4("view", camara->getViewM4());
 
 		glBindVertexArray(vao_cubo->get_VAO());
+
 		for (auto& vec : transition)
 		{
+			//cout << camara->getPos().x << endl;
 			if(vec.y<=0.3)
 			{
 				glActiveTexture(GL_TEXTURE0);
@@ -195,53 +223,10 @@ i32 main() {
 				glBindTexture(GL_TEXTURE_2D, texture3);
 			}
 			glm::mat4 model = glm::mat4(1.0f);
-			//std::cout << vec.x << ' ' << vec.y << " " << vec.z << "\n";
 			model = glm::translate(model, glm::vec3(vec.x, vec.y, vec.z) * glm::vec3(2.0f, 2.0f, 2.0f));
-			//f32 theta = (f32)glfwGetTime();
-			//model = glm::rotate(model, sin(theta)+50.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 			shader->setMat4("model", model);
 			glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
 
-			/*if(vec.w==1)
-			{
-				//glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, textura_side);
-				glBindVertexArray(VAOside);
-				glDrawArrays(GL_TRIANGLES, 0, 24);
-
-				//glActiveTexture(GL_TEXTURE1);
-				glBindTexture(GL_TEXTURE_2D, top_Texture);
-				glBindVertexArray(VAOtop);
-				glDrawArrays(GL_TRIANGLES, 0, 6);
-			}
-			else
-			{
-				//glActiveTexture(GL_TEXTURE2);
-				glBindTexture(GL_TEXTURE_2D, dirtTexture);
-				glBindVertexArray(VAOdirt);
-				glDrawArrays(GL_TRIANGLES, 0, 36);
-
-			}*/
-			/*if (vec.w == 1) {
-				glActiveTexture(GL_TEXTURE0);
-				sideTexture.bind(GL_TEXTURE_2D);
-
-				glBindVertexArray(VAOside);
-				glDrawArrays(GL_TRIANGLES, 0, 24);
-
-				glActiveTexture(GL_TEXTURE0);
-				topTexture.bind(GL_TEXTURE_2D);
-
-				glBindVertexArray(VAOtop);
-				glDrawArrays(GL_TRIANGLES, 0, 6);
-			}
-			else {
-				glActiveTexture(GL_TEXTURE0);
-				dirtTexture.bind(GL_TEXTURE_2D);
-
-				glBindVertexArray(VAOdirt);
-				glDrawArrays(GL_TRIANGLES, 0, 36);
-			}*/
 		}
 
 		glfwSwapBuffers(window);
@@ -251,8 +236,8 @@ i32 main() {
 
 	delete shader_tierra;
 	delete shader;
-
+	//delete terrain[MAX_X][MAX_Z];
 	cubex->~Cube();
-	//cubito->~Cube();
+
 	return 0;
 }
