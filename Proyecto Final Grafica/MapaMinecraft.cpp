@@ -120,27 +120,7 @@ i32 main() {
 	
 	Cube* cubex = new Cube();
 	
-	Shader* figure_avion = new Shader("shader_avion.vert", "shader_avion.frag");
 
-	Figure* figure = new Figure();
-	
-	figure->read("OFF/avion.off", figure, false, false);
-	figure->registerFigure();
-
-	//Cube* cubex_material = new Cube(false,9);
-
-	ui32 g = 1;
-	std::vector<glm::vec3> positions_tierra(g * g);//PINTA
-	for (ui32 i = 0; i < g; ++i)
-	{
-		for (ui32 j = 0; j < g; ++j)
-		{
-			f32 x = (i - g / 2.0f);
-			f32 z = (i - j / 2.0f);
-			f32 y = 8.0;
-			positions_tierra[i * g + j] = glm::vec3(x, y, z);
-		}
-	}
 
 	VAO* vao_cubo = new VAO(cubex);
 	VAO* vao_cubo_light = new VAO(cubex);
@@ -155,10 +135,6 @@ i32 main() {
 	ui32 texture3 = shader->loadTexture("roca.jpg", texture3);
 	ui32 texture4 = shader->loadTexture("cesped.jpg", texture4);
 
-	ui32 texture_gold = shader_material->loadTexture("oro_texture.jpg", texture_gold);
-	ui32 texture_jade = shader_material->loadTexture("jade.jpg", texture_jade);
-	ui32 texture_perla = shader_material->loadTexture("perla.jpg", texture_perla);
-	ui32 texture_ruby = shader_material->loadTexture("ruby.jpg", texture_ruby);
 
 	ui32 limite = 0.5;
 	while (!glfwWindowShouldClose(window)) {
@@ -206,15 +182,7 @@ i32 main() {
 		shader_tierra->setMat4("model", model);
 
 		glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
-		/*for (ui32 i = 0; i < positions_tierra.size(); ++i) { 
-			glm::mat4 model = glm::mat4(1.0f);
-			//model = glm::rotate(model, theta, glm::vec3(0.0f, 0.3f, 0.0f));
-			model = glm::translate(model, glm::vec3(5.0f, 13.0f, 4.0f));
-			shader_tierra->setMat4("model", model);
-
-			glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
-			
-			}*/		
+	
 
 		
 		shader->useProgram();
@@ -274,95 +242,7 @@ i32 main() {
 
 		}
 
-
-		shader_material->useProgram();
-		shader_material->setVec3("objectColor", 1.0f, 1.0f, 1.0f);
-		//Material properties
-		shader_material->setVec3("material.ambient", 0.24725f, 0.1995f, 0.0745f);
-		shader_material->setVec3("material.diffuse", 0.75164f, 0.60648f, 0.22648f);
-		shader_material->setVec3("material.specular", 0.628281f, 0.555802f, 0.366065f);
-		shader_material->setF32("material.shininess", 0.4f);
-
-		//light properties 
-		shader_material->setVec3("light.ambient", ambientColor.x, ambientColor.y, ambientColor.z);
-		shader_material->setVec3("light.diffuse", diffuseColor.x, diffuseColor.y, diffuseColor.z);
-		shader_material->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-
-		shader_material->setVec3("viewPos", camara->getPos().x, camara->getPos().y, camara->getPos().z);
-		shader_material->setVec3("lightPos", 5.0f, 13.0f, 4.0f);
-		shader_material->setVec3("lightColor", lightColor.x, lightColor.y, lightColor.z);
-		shader_material->setMat4("modelo", glm::mat4(1.0f));
-		// agregarle el rotate al modelo rotate(glm::mat4(1.0),theta, glm::vec3(0.0f, 0.3f, 0.0f))
-
-		shader_material->setMat4("proj", projection);
-		shader_material->setMat4("view", camara->getViewM4());
-
-		glBindVertexArray(vao_cubo->get_VAO());
-		//glm::mat4 model = glm::mat4(1.0f);
-		//model = glm::rotate(model, theta, glm::vec3(0.5f, 0.3f, 0.0f));
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture_gold);
-		model = glm::translate(model, glm::vec3(4.0f, 0.0f, 5.0f));
-		shader_material->setMat4("model", model);
-		glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
-
-		//Jade
-
-		shader_material->useProgram();
-		shader_material->setVec3("objectColor", 1.0f, 1.0f, 1.0f);
-		//Material properties
-		shader_material->setVec3("material.ambient", 0.135f, 0.2225f, 0.1575f);
-		shader_material->setVec3("material.diffuse", 0.54f, 0.89f, 0.63f);
-		shader_material->setVec3("material.specular", 0.316228f, 0.316228f, 0.316228f);
-		shader_material->setF32("material.shininess", 0.1f);
-
-		glBindVertexArray(vao_cubo->get_VAO());
-		//glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture_jade);
-		model = glm::translate(model, glm::vec3(-2.0f, 0.0f, 0.0f)); // x,y,z
-		shader_material->setMat4("model", model);
-		glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
-
-		//Perla
-		shader_material->useProgram();
-		shader_material->setVec3("objectColor", 1.0f, 1.0f, 1.0f);
-		//Material properties
-		shader_material->setVec3("material.ambient", 0.25f, 0.20725f, 0.20725f);
-		shader_material->setVec3("material.diffuse", 1.0f, 0.829f, 0.829f);
-		shader_material->setVec3("material.specular", 0.296648f, 0.296648f, 0.296648f);
-		shader_material->setF32("material.shininess", 0.088f);
-
-		glBindVertexArray(vao_cubo->get_VAO());
-		//glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture_perla);
-		model = glm::translate(model, glm::vec3(-2.0f, 0.0f, 0.0f)); // x,y,z
-		shader_material->setMat4("model", model);
-		glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
-
-		//Ruby
-		shader_material->useProgram();
-		shader_material->setVec3("objectColor", 1.0f, 1.0f, 1.0f);
-		//Material properties
-		shader_material->setVec3("material.ambient", 0.1745f, 0.01175f, 0.01175f);
-		shader_material->setVec3("material.diffuse", 0.61424f, 0.04136f, 0.04136f);
-		shader_material->setVec3("material.specular", 0.727811f, 0.626959f, 0.626959f);
-		shader_material->setF32("material.shininess", 0.6f);
-
-		glBindVertexArray(vao_cubo->get_VAO());
-		//glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture_ruby);
-		model = glm::translate(model, glm::vec3(-2.0f, 0.0f, 0.0f)); // x,y,z
-		shader_material->setMat4("model", model);
-		glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
-
-		figure_avion->useProgram();
-		figure_avion->setMat4("proj", projection);
-		figure_avion->setMat4("view", camara->getViewM4());
-
-		//model = glm::rotate(model, theta, glm::vec3(0.0f, 0.3f, 0.0f));
-		model = glm::translate(model, glm::vec3(5.0f, 13.0f, 4.0f));
-		figure_avion->setMat4("model", model);
-		figure->drawFigure();
+	
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -371,9 +251,7 @@ i32 main() {
 	delete shader_tierra;
 	delete shader;
 	delete shader_material;
-	delete figure;
-	delete figure_avion;
-	//delete terrain[MAX_X][MAX_Z];
+
 	cubex->~Cube();
 
 	return 0;
