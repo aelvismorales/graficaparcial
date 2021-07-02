@@ -18,8 +18,8 @@
 using namespace std;
 //*****************************************
 
-constexpr ui32 MAX_X{15};
-constexpr ui32 MAX_Z{15};
+constexpr ui32 MAX_X{30};
+constexpr ui32 MAX_Z{30};
 //constexpr uint MAX_HEIGHT{100};
 constexpr ui32 NUMBER_OF_ITERATIONS{10};
 #include "terreno.h"
@@ -130,8 +130,14 @@ i32 main() {
 	Files* files = new Files("bin", "resources/textures", "resources/objects");
 
 	ShaderTO* shader_mono = new ShaderTO(files, "shader_monkey.vert", "shader_monkey.frag");
+	
 	Model* monito = new Model(files, "monito/monito.obj");
 
+	Model* steve = new Model(files, "steve/steve.obj");
+
+	Model* dragon = new Model(files, "ender/tuomp.obj");
+
+	Model* wolf = new Model(files, "wolf/untitled.obj");
 
 	VAO* vao_cubo = new VAO(cubex);
 	VAO* vao_cubo_light = new VAO(cubex);
@@ -145,8 +151,8 @@ i32 main() {
 	ui32 texture2 = shader->loadTexture("tierra.jpg", texture2);
 	ui32 texture3 = shader->loadTexture("roca.jpg", texture3);
 	ui32 texture4 = shader->loadTexture("cesped.jpg", texture4);
-	glm::vec3 lightPos = glm::vec3(1.0f);
-	glm::vec3 lightColor = glm::vec3(1.0f);
+	glm::vec3 lightPos = glm::vec3(6.0f,13.0f,4.0f);
+	//glm::vec3 lightColor = glm::vec3(1.0f);
 
 	ui32 limite = 0.5;
 	while (!glfwWindowShouldClose(window)) {
@@ -154,24 +160,9 @@ i32 main() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		processInput(window);
-		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.122f, 0.34f, 0.59f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		set_pos_z = camara->getPos().z/16;
-		set_pos_x = camara->getPos().x / 16;
-		/*if (set_pos_z == 16) 
-		{
-			generate_transitions<MAX_X, MAX_Z>(terrain, transition, camara->getPos(), set_pos_x, set_pos_z);
-			set_pos_z = 0;
-		}*/
-		/*if (set_pos_z >limite )
-		{
-			camara->set_speed(0);
-			cout << camara->getPos().z << endl;
-			generate_transitions<MAX_X, MAX_Z>(terrain, transition, camara->getPos(), set_pos_x, set_pos_z);
 
-			limite += limite;
-			
-		}*/
 
 		
 		shader_tierra->useProgram();
@@ -188,9 +179,10 @@ i32 main() {
 		shader_tierra->setMat4("view", camara->getViewM4());
 
 		glBindVertexArray(vao_cubo_light->get_VAO());
-		glm::mat4 model = glm::mat4(1.0f);
-		//model = glm::rotate(model, theta, glm::vec3(0.0f, 0.3f, 0.0f));
-		model = glm::translate(model, glm::vec3(5.0f, 13.0f, 4.0f));
+		glm::mat4 model = glm::mat4(2.0f);
+		model = glm::rotate(model, theta*0.05f, glm::vec3(0.05f, 0.0f, 0.0f));
+		//lightPos = glm::vec3(model * glm::vec4(lightPos, 1.0));
+		model = glm::translate(model,lightPos);
 		shader_tierra->setMat4("model", model);
 
 		glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
@@ -203,7 +195,7 @@ i32 main() {
 		shader->setVec3("material.ambient", 1.0f, 1.0f, 1.0f);
 		shader->setVec3("material.diffuse", 1.0f, 1.0f, 1.0f);
 		shader->setVec3("material.specular", 1.0f, 1.0f, 1.0f);
-		shader->setF32("material.shininess", 32.0f);
+		shader->setF32("material.shininess", 5.0f);
 
 		//light properties 
 		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // decrease the influence
@@ -213,9 +205,14 @@ i32 main() {
 		shader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
 		shader->setVec3("viewPos", camara->getPos().x, camara->getPos().y, camara->getPos().z);
-		shader->setVec3("lightPos", 5.0f, 13.0f, 4.0f);
+		shader->setVec3("lightPos", lightPos.x,lightPos.y,lightPos.z);
 		shader->setVec3("lightColor", lightColor.x, lightColor.y, lightColor.z);
-		shader->setMat4("modelo", glm::mat4(1.0f));
+		
+		//model = glm::translate(model, glm::vec3(4.0f, 13.0f, 4.0f));
+		//model = glm::rotate(model, theta, glm::vec3(0.05f, 0.0f, 0.0f));
+		shader->setMat4("modelo", glm::rotate(model, theta*0.05f, glm::vec3(0.05f, 0.0f, 0.0f))); //glm::mat4(1.0f)
+		
+		 //shader->setVec3("lightPos", model[1].x,model[1].y,model[1].z);
 		// agregarle el rotate al modelo rotate(glm::mat4(1.0),theta, glm::vec3(0.0f, 0.3f, 0.0f))
 
 		shader->setMat4("proj", projection);
@@ -253,6 +250,7 @@ i32 main() {
 			glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
 
 		}
+		/*
 		shader_mono->use();
 		lightPos.x = 2.0f * (cos(currentFrame) - sin(currentFrame));
 		lightPos.z = 2.0f * (cos(currentFrame) + sin(currentFrame));
@@ -266,8 +264,61 @@ i32 main() {
 		model = glm::mat4(1.0f);
 		model = translate(model, glm::vec3(0.0f, 0.0f, -2.0f));
 		shader_mono->setMat4("model", model);
-		monito->Draw(shader_mono);
+		monito->Draw(shader_mono);*/
 	
+		shader_mono->use();
+		//lightPos.x = 2.0f * (cos(currentFrame) - sin(currentFrame));
+		//lightPos.z = 2.0f * (cos(currentFrame) + sin(currentFrame));
+		shader_mono->setVec3("xyz", lightPos.x, lightPos.y, lightPos.z);
+		shader_mono->setVec3("xyzColor", lightColor);
+		shader_mono->setVec3("xyzView", camara->getPos());
+		//glm::mat4 proj = glm::perspective(cam->zoom, ASPECT, 0.1f, 100.0f);
+		shader_mono->setMat4("proj", projection);
+		shader_mono->setMat4("view", camara->getViewM4());
+
+		model = glm::mat4(1.0f);
+		model = translate(model, glm::vec3(5.0f, 3.40f, 2.0f)/*camara->getPos() + glm::vec3(1.0f, -2.0f, 0.0f)*/); //glm::vec3(0.0f, 10.0f, -2.0f)
+		model = glm::scale(model, glm::vec3(0.20f));
+		shader_mono->setMat4("model", model);
+		steve->Draw(shader_mono);
+
+		shader_mono->use();
+		//lightPos.x = 2.0f * (cos(currentFrame) - sin(currentFrame));
+		//lightPos.z = 2.0f * (cos(currentFrame) + sin(currentFrame));
+		shader_mono->setVec3("xyz", lightPos.x, lightPos.y, lightPos.z);
+		shader_mono->setVec3("xyzColor", lightColor);
+		shader_mono->setVec3("xyzView", camara->getPos());
+		//glm::mat4 proj = glm::perspective(cam->zoom, ASPECT, 0.1f, 100.0f);
+		shader_mono->setMat4("proj", projection);
+		shader_mono->setMat4("view", camara->getViewM4());
+
+		model = glm::mat4(1.3f);
+		model = translate(model, glm::vec3(8.0f, 1.0f, 7.0f)/*camara->getPos() + glm::vec3(1.0f, -2.0f, 0.0f)*/); //glm::vec3(0.0f, 10.0f, -2.0f)
+		model = glm::rotate(model, theta*-1.0f, glm::vec3(0.2f, 1.5f, 0.0f));
+		model = translate(model, glm::vec3(8.0f, 10.0f, 7.0f)/*camara->getPos() + glm::vec3(1.0f, -2.0f, 0.0f)*/); //glm::vec3(0.0f, 10.0f, -2.0f)
+		//model = glm::scale(model, glm::vec3(0.25f));
+		shader_mono->setMat4("model", model);
+	
+		dragon->Draw(shader_mono);
+
+
+		shader_mono->use();
+		//lightPos.x = 2.0f * (cos(currentFrame) - sin(currentFrame));
+		//lightPos.z = 2.0f * (cos(currentFrame) + sin(currentFrame));
+		shader_mono->setVec3("xyz", lightPos.x, lightPos.y, lightPos.z);
+		shader_mono->setVec3("xyzColor", lightColor);
+		shader_mono->setVec3("xyzView", camara->getPos());
+		//glm::mat4 proj = glm::perspective(cam->zoom, ASPECT, 0.1f, 100.0f);
+		shader_mono->setMat4("proj", projection);
+		shader_mono->setMat4("view", camara->getViewM4());
+
+		model = glm::mat4(1.0f);
+		model = translate(model, glm::vec3(6.0f, 3.80f, 2.20f)/*camara->getPos() + glm::vec3(1.0f, -2.0f, 0.0f)*/); //glm::vec3(0.0f, 10.0f, -2.0f)
+		model = glm::scale(model, glm::vec3(1.20f));
+		shader_mono->setMat4("model", model);
+
+		wolf->Draw(shader_mono);
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
