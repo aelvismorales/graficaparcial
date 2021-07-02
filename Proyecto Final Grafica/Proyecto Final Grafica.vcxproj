@@ -146,6 +146,14 @@
     <ClCompile Include="MapaMinecraft.cpp" />
     <ClCompile Include="stb_image.c" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\cam.hpp" />
+    <ClInclude Include="..\include\files.hpp" />
+    <ClInclude Include="..\include\glutil.h" />
+    <ClInclude Include="..\include\glutil.hpp" />
+    <ClInclude Include="..\include\mesh.h" />
+    <ClInclude Include="..\include\model.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

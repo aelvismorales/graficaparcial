@@ -6,7 +6,7 @@
 #include <assimp/postprocess.h>
 
 #include <mesh.h>
-#include <files.hpp>
+//#include <files.hpp>
 
 u32 TextureFromFile(const std::string& fileName, i32 param = GL_LINEAR) {
 	u32 texture;

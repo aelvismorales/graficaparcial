@@ -10,7 +10,11 @@
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
-//#include "Texture.h"
+
+#include <files.hpp>
+#include <model.h>
+#include <cam.hpp>
+
 using namespace std;
 //*****************************************
 
@@ -40,6 +44,7 @@ f32 sensitivity = 0.1f;
 
 f32 deltaTime = 0.0f;
 f32 lastFrame = 0.0f;
+bool wireframe = false;
 
 /**
  * keyboard input processing
@@ -53,13 +58,13 @@ void processInput(GLFWwindow* window) {
 		
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		camara->inputprocces(LEFT, deltaTime);
+		camara->inputprocces(LEFTO, deltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		camara->inputprocces(DOWN, deltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		camara->inputprocces(RIGHT, deltaTime);
+		camara->inputprocces(RIGHTO, deltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 		camara->inputprocces(GOUP, deltaTime);
@@ -99,6 +104,7 @@ void mouse_Callback(GLFWwindow* window, f64 xpos, f64 ypos)
 }
 
 
+
 void scroll_Callback(GLFWwindow* window, f64 xoffset, f64 yoffset)
 {
 	camara->scroll_mouse(xoffset, yoffset);
@@ -120,6 +126,11 @@ i32 main() {
 	
 	Cube* cubex = new Cube();
 	
+	//Assimp
+	Files* files = new Files("bin", "resources/textures", "resources/objects");
+
+	ShaderTO* shader_mono = new ShaderTO(files, "shader_monkey.vert", "shader_monkey.frag");
+	Model* monito = new Model(files, "monito/monito.obj");
 
 
 	VAO* vao_cubo = new VAO(cubex);
@@ -134,7 +145,8 @@ i32 main() {
 	ui32 texture2 = shader->loadTexture("tierra.jpg", texture2);
 	ui32 texture3 = shader->loadTexture("roca.jpg", texture3);
 	ui32 texture4 = shader->loadTexture("cesped.jpg", texture4);
-
+	glm::vec3 lightPos = glm::vec3(1.0f);
+	glm::vec3 lightColor = glm::vec3(1.0f);
 
 	ui32 limite = 0.5;
 	while (!glfwWindowShouldClose(window)) {
@@ -241,7 +253,20 @@ i32 main() {
 			glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
 
 		}
+		shader_mono->use();
+		lightPos.x = 2.0f * (cos(currentFrame) - sin(currentFrame));
+		lightPos.z = 2.0f * (cos(currentFrame) + sin(currentFrame));
+		shader_mono->setVec3("xyz", lightPos);
+		shader_mono->setVec3("xyzColor", lightColor);
+		shader_mono->setVec3("xyzView", camara->getPos());
+		//glm::mat4 proj = glm::perspective(cam->zoom, ASPECT, 0.1f, 100.0f);
+		shader_mono->setMat4("proj", projection);
+		shader_mono->setMat4("view", camara->getViewM4());
 
+		model = glm::mat4(1.0f);
+		model = translate(model, glm::vec3(0.0f, 0.0f, -2.0f));
+		shader_mono->setMat4("model", model);
+		monito->Draw(shader_mono);
 	
 		glfwSwapBuffers(window);
 		glfwPollEvents();
